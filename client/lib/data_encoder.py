@@ -21,7 +21,7 @@ class Encoder():
     def _pack_data_segment(self, uuid, name, sequence_number, data):
         return uuid + name + '.' + self._pad_sequence_number(sequence_number) + data
 
-    def encoder(self, uuid, name, data):
+    def encode(self, uuid, name, data):
         largest_a_dns_packet_can_be = 254
         uuid_bytes = 4
         sequence_number_bytes = 4
@@ -34,5 +34,3 @@ class Encoder():
         packed_data = [self._pack_data_segment(uuid, name, index, packet) for index, packet in enumerate(split_data)]
         return packed_data
 
-print(Encoder().encoder('abcd', 'yes we can',
-        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'))

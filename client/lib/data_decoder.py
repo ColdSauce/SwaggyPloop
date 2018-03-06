@@ -20,6 +20,6 @@ class Decoder():
         return (uuid, name, sequence_number, final_unpacked_data)
 
 
-    def decoder(self, packets):
+    def decode(self, packets):
         decoded_packets = [self._unpack_data_segment(data_segment) for data_segment in packets]
         return decoded_packets
