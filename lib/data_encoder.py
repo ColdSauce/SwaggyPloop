@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 class Encoder():
     def _split_string_into_n_sequences(self, s, n):
         split_at = int(len(s) / n)
@@ -33,4 +35,3 @@ class Encoder():
         split_data = self._split_string_into_n_sequences(data, amount_bytes_per_packet)
         packed_data = [self._pack_data_segment(uuid, name, index, packet) for index, packet in enumerate(split_data)]
         return packed_data
-

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 class Decoder():
     def _unpad_sequence_number(self, num):
         return int(num)
@@ -12,7 +14,8 @@ class Decoder():
         name = data[:data.find('.')]
         data = data[data.find('.'):]
 
-        sequence_number = self._unpad_sequence_number(data[1:sequence_number_bytes + 1])
+        sequence_number = self._unpad_sequence_number(
+            data[1:sequence_number_bytes + 1])
         data = data[sequence_number_bytes + 1:]
 
         final_unpacked_data = data
@@ -21,5 +24,7 @@ class Decoder():
 
 
     def decode(self, packets):
-        decoded_packets = [self._unpack_data_segment(data_segment) for data_segment in packets]
+        decoded_packets = [
+            self._unpack_data_segment(data_segment)
+            for data_segment in packets]
         return decoded_packets
