@@ -16,6 +16,7 @@ class Encoder():
         amount_needed_to_pad =  sequence_number_bytes - len(str(num))
         for r in range(0, amount_needed_to_pad):
             padded += "0"
+
         return padded + str(num)
 
     def _pack_data_segment(self, uuid, name, sequence_number, data):
@@ -26,11 +27,12 @@ class Encoder():
         uuid_bytes = 4
         sequence_number_bytes = 4
         header_bytes = uuid_bytes + len(name)
-        amount_bytes_per_packet = int(len(data) / (largest_a_dns_packet_can_be - header_bytes))
-        if amount_bytes_per_packet == 0:
+        amount_packets = int(len(data) / (largest_a_dns_packet_can_be - header_bytes)) + 1
+        if amount_packets == 1:
             return [self._pack_data_segment(uuid, name, 0, data)]
 
-        split_data = self._split_string_into_n_sequences(data, amount_bytes_per_packet)
+        split_data = self._split_string_into_n_sequences(data, amount_packets)
         packed_data = [self._pack_data_segment(uuid, name, index, packet) for index, packet in enumerate(split_data)]
         return packed_data
 
+print(Encoder().encode("hell", "yolo", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
