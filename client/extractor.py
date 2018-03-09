@@ -1,7 +1,8 @@
+#!/usr/bin/env python3
+
 import re
 import os
 import magic
-from os.path import join
 
 class Extractor():
     def __init__(self):
@@ -31,10 +32,10 @@ class Extractor():
         all_files_found = []
         for root, directories, files in os.walk(directory):
             for file in files:
-                file_name = join(root, file)
+                file_name = os.join(root, file)
                 if self._is_in_blacklist(file_name):
                     continue
-                try: 
+                try:
                     if self.magi.from_file(file_name) != 'text/plain':
                         continue
                     with open(file_name, 'r') as f:
@@ -45,4 +46,4 @@ class Extractor():
                                 all_files_found.append(file_name)
                 except IOError:
                     continue
-        return all_files_found            
+        return all_files_found
