@@ -21,7 +21,8 @@ class Encoder():
 
         return padded + str(num)
 
-    def _pack_data_segment(self, mac_address, timestamp, name, sequence_number, data, is_last_packet):
+    def _pack_data_segment(self, mac_address, timestamp, name, sequence_number,
+                           data, is_last_packet):
         to_return =  mac_address + timestamp + name + '.' + self._pad_sequence_number(sequence_number) + data
         if is_last_packet:
             to_return += '\\E'
@@ -37,13 +38,15 @@ class Encoder():
 
     def encode(self, mac_address, timestamp, name, data):
         largest_a_dns_packet_can_be = 254
-        
+
         header_bytes = self._get_header_bytes()
-        amount_packets = int(len(data) / (largest_a_dns_packet_can_be - header_bytes)) + 1
+        amount_packets = int(len(data) / (largest_a_dns_packet_can_be -
+            header_bytes)) + 1
         is_last_packet = False
         if amount_packets == 1:
             is_last_packet = True
-            return [self._pack_data_segment(mac_address, timestamp, name, 0, data, is_last_packet)]
+            return [self._pack_data_segment(mac_address, timestamp, name, 0,
+                                            data, is_last_packet)]
 
         split_data = self._split_string_into_n_sequences(data, amount_packets)
 
@@ -51,5 +54,8 @@ class Encoder():
         for index, packet in enumerate(split_data):
             if index == len(split_data) - 1:
                 is_last_packet = True
-            packed_data.append(self._pack_data_segment(mac_address, timestamp, name, index, split_data[index], is_last_packet))
+            packed_data.append(self._pack_data_segment(mac_address, timestamp,
+                                                       name, index,
+                                                       split_data[index],
+                                                       is_last_packet))
         return packed_data

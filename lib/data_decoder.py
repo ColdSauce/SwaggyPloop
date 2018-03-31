@@ -17,15 +17,17 @@ class Packet():
 
 class Decoder():
     def get_packet_from_raw_data(self, data):
-        sequence_number_bytes = 4
         mac_address_bytes = 6
         timestamp_bytes = 4
+        sequence_number_bytes = 4
 
+        # _read_packet does not mutate the string, so we need to take the
+        # truncated data for passing to the next function
         mac_address, data = self._read_packet(mac_address_bytes, data)
         timestamp, data = self._read_packet(timestamp_bytes, data)
         name, data = self._read_packet(data.find('.'), data)
-        
-        sequence_number, data = self._read_packet(sequence_number_bytes, data, 1)
+        sequence_number, data = self._read_packet(
+            sequence_number_bytes, data, 1)
         sequence_number = self._unpad_sequence_number(sequence_number)
 
         is_last_packet = data.find('\\E') != -1
