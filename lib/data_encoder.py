@@ -36,7 +36,7 @@ class Encoder():
             '{:0' + str(TIMESTAMP_BYTES) + 'd}').format(timestamp)
         padded_sequence_number = (
             '{:0' + str(SEQUENCE_NUMBER_BYTES) + 'd}').format(sequence_number)
-        return str(mac_address) + str(timestamp) + padded_sequence_number
+        return padded_mac_address + padded_timestamp + padded_sequence_number
 
     @staticmethod
     def __split_payload__(payload):
