@@ -1,61 +1,60 @@
 #!/usr/bin/env python3
+# This module handles the encoding of a large data payload into multiple DNS
+# requests.
+
+import base64
+import more_itertools
+
+from constants import *
 
 class Encoder():
-    def _split_string_into_n_sequences(self, s, n):
-        split_at = int(len(s) / n)
-        result_list = []
-        for index in range(0, len(s), split_at):
-            if index > len(s) - split_at - 1:
-                result_list.append(s[index:])
-            else:
-                result_list.append(s[index:index + split_at])
 
-        return result_list
+    @staticmethod
+    def __get_request_prefix__(mac_address, timestamp, sequence_number):
+        """
+        Validates and returns the DNS request prefix.
+        """
+        assert len(mac_address) == MAC_ADDRESS_BYTES
+        assert len(timestamp) == TIMESTAMP_BYTES
+        assert len(str(sequence_number)) <= SEQUENCE_NUMBER_BYTES
+        padded_sequence_number = (
+            '{:0' + str(SEQUENCE_NUMBER_BYTES) + 'd}').format(sequence_number)
+        return str(mac_address) + str(timestamp) + padded_sequence_number
 
-    def _pad_sequence_number(self, num):
-        padded = ""
-        sequence_number_bytes = 4
-        amount_needed_to_pad =  sequence_number_bytes - len(str(num))
-        for r in range(0, amount_needed_to_pad):
-            padded += "0"
+    @staticmethod
+    def __split_payload__(payload):
+        """
+        Encodes the given payload with base64 and splits it into chunks of size
+        PAYLOAD_BYTES.
+        """
+        payload_base64 = base64.b64encode(
+            payload.encode('ascii')).decode('utf-8')
+        return more_itertools.sliced(payload_base64, PAYLOAD_BYTES)
 
-        return padded + str(num)
+    @staticmethod
+    def encode_payload(mac_address, timestamp, name, payload):
+        """
+        Given a MAC address, timestamp identifier, payload name, and the raw
+        payload data, this function returns a list of formatted requests to send
+        through DNS. Each packet consists of a formatted prefix containing the
+        MAC address and timestamp identifier followed by a chunk of the payload.
+        The first packet sent will contain the payload name and the last packet
+        sent will contain an end delimeter.
 
-    def _pack_data_segment(self, mac_address, timestamp, name, sequence_number,
-                           data, is_last_packet):
-        to_return =  mac_address + timestamp + name + '.' + self._pad_sequence_number(sequence_number) + data
-        if is_last_packet:
-            to_return += '\\E'
-        return to_return
+        MAC address will be used to identify where the payload originated, and
+        the timestamp identifier will be used to identify requests that are
+        parts of a single payload. Each request carrying a part of a split
+        payload will have the same timestamp identifier since it represents
+        the creation time of the payload.
+        """
+        payloads = [name] + list(Encoder.__split_payload__(payload)) + ['\\E']
+        requests = []
+        for sequence_number, payload in enumerate(payloads):
+            prefix = Encoder.__get_request_prefix__(
+                mac_address, timestamp, sequence_number)
+            request = prefix + payload
+            requests.append(request)
+        return requests
 
-    def _get_header_bytes(self):
-        mac_address_bytes = 6
-        timestamp_bytes = 4
-        delimiter_byte = 1
-        sequence_number_bytes = 4
-        end_bytes = 2
-        return mac_address_bytes + timestamp_bytes + sequence_number_bytes + end_bytes + delimiter_byte
-
-    def encode(self, mac_address, timestamp, name, data):
-        largest_a_dns_packet_can_be = 254
-
-        header_bytes = self._get_header_bytes()
-        amount_packets = int(len(data) / (largest_a_dns_packet_can_be -
-            header_bytes)) + 1
-        is_last_packet = False
-        if amount_packets == 1:
-            is_last_packet = True
-            return [self._pack_data_segment(mac_address, timestamp, name, 0,
-                                            data, is_last_packet)]
-
-        split_data = self._split_string_into_n_sequences(data, amount_packets)
-
-        packed_data = []
-        for index, packet in enumerate(split_data):
-            if index == len(split_data) - 1:
-                is_last_packet = True
-            packed_data.append(self._pack_data_segment(mac_address, timestamp,
-                                                       name, index,
-                                                       split_data[index],
-                                                       is_last_packet))
-        return packed_data
+if __name__ == '__main__':
+    print(Encoder.encode_payload('ABCDEF', '1111100000', 'bobthe', 'dasdf'))

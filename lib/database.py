@@ -2,18 +2,9 @@
 
 import os
 import sqlite3
-import sys
 import time
 
-# Constants
 DATABASE_FILENAME = 'database.db'
-FILEPATH = os.path.abspath(__FILE__)
-
-# Path modification for project dependencies
-def parent_chain(path, n):
-    for i in range(n):
-        path = os.path.dirname(path)
-    return path
 
 class Database:
     def __init__(self, connection):
@@ -23,7 +14,7 @@ class Database:
 
     @staticmethod
     def get_default():
-        filename = os.path.join(parent_chain(FILEPATH, 2), DATABASE_FILENAME)
+        filename = os.path.join(os.environ['PROJECT_ROOT'], DATABASE_FILENAME)
         return Database(sqlite3.connect(filename))
 
     def setup(self):
