@@ -4,8 +4,21 @@
 
 import base64
 import more_itertools
+import os
+import sys
 
-from constants import *
+# Constants
+FILEPATH = os.path.abspath(__file__)
+
+# Path modification for project dependencies
+def parent_chain(path, n):
+    for i in range(n):
+        path = os.path.dirname(path)
+    return path
+sys.path.insert(1, parent_chain(FILEPATH, 2))
+
+# Project level dependencies
+from lib.constants import *
 
 class Encoder():
 
@@ -38,8 +51,9 @@ class Encoder():
         payload data, this function returns a list of formatted requests to send
         through DNS. Each packet consists of a formatted prefix containing the
         MAC address and timestamp identifier followed by a chunk of the payload.
-        The first packet sent will contain the payload name and the last packet
-        sent will contain an end delimeter.
+        The first request sent will contain the payload name and the last
+        request sent will contain an end delimeter. The last request with the
+        end delimeter will have sequence number 0.
 
         MAC address will be used to identify where the payload originated, and
         the timestamp identifier will be used to identify requests that are
@@ -47,13 +61,16 @@ class Encoder():
         payload will have the same timestamp identifier since it represents
         the creation time of the payload.
         """
-        payloads = [name] + list(Encoder.__split_payload__(payload)) + ['\\E']
+        payloads = [name] + list(Encoder.__split_payload__(payload))
         requests = []
         for sequence_number, payload in enumerate(payloads):
             prefix = Encoder.__get_request_prefix__(
-                mac_address, timestamp, sequence_number)
+                mac_address, timestamp, sequence_number + 1)
             request = prefix + payload
             requests.append(request)
+        # Add end delimeter
+        requests.append(Encoder.__get_request_prefix__(
+            mac_address, timestamp, 0) + 'END')
         return requests
 
 if __name__ == '__main__':

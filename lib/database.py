@@ -1,10 +1,19 @@
-#!/usr/in/env python3
+#!/usr/bin/env python3
 
 import os
 import sqlite3
+import sys
 import time
 
+# Constants
 DATABASE_FILENAME = 'database.db'
+FILEPATH = os.path.abspath(__file__)
+
+# Path modification for project dependencies
+def parent_chain(path, n):
+    for i in range(n):
+        path = os.path.dirname(path)
+    return path
 
 class Database:
     def __init__(self, connection):
@@ -14,33 +23,35 @@ class Database:
 
     @staticmethod
     def get_default():
-        filename = os.path.join(os.environ['PROJECT_ROOT'], DATABASE_FILENAME)
+        filename = os.path.join(parent_chain(FILEPATH, 2), DATABASE_FILENAME)
         return Database(sqlite3.connect(filename))
 
     def setup(self):
         self.cursor.execute(
             '''CREATE TABLE IF NOT EXISTS exfiltrated_data
                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                uuid CHAR(6),
-                packet_id INTEGER,
-                packet_number INTEGER,
-                blob BLOB)
+                mac_address INTEGER,
+                payload_id INTEGER,
+                sequence_number INTEGER,
+                payload BLOB)
             ''')
         self.connection.commit()
 
-    def add_blob(self, uuid, packet_id, packet_number, blob):
+    def add(self, mac_address, payload_id, sequence_number, payload):
         self.cursor.execute(
             '''INSERT INTO exfiltrated_data
-            (uuid, packet_id, packet_number, blob) VALUES (?,?,?,?,?)''',
-            (uuid, packet_id, packet_number, blob))
+            (mac_address, payload_id, sequence_number, payload)
+            VALUES (?,?,?,?)''',
+            (mac_address, payload_id, sequence_number, payload))
         self.connection.commit()
 
-    def _get_data(self, uuid, packet_id):
+    def get(self, mac_address, payload_id):
         self.cursor.execute(
-            '''SELECT * FROM exfiltrated_data WHERE uuid=? AND packet_id=?
-            ORDER BY packet_number ASC''',
-            (uuid, packet_id))
-        return "".join([entry[5] for entry in self.cursor])
+            '''SELECT * FROM exfiltrated_data
+            WHERE mac_address=? AND payload_id=?
+            ORDER BY sequence_number ASC''',
+            (mac_address, payload_id))
+        return [entry[1:] for entry in self.cursor]
 
     def close(self):
         self.connection.close()

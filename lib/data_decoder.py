@@ -4,13 +4,25 @@
 # segments and will not handle payload reconstruction.
 
 import base64
+import os
+import sys
 
-from constants import *
-
+# Constants
+FILEPATH = os.path.abspath(__file__)
 MAC_ADDRESS = 0
 TIMESTAMP = 1
 SEQUENCE_NUMBER = 2
 PAYLOAD = 3
+
+# Path modification for project dependencies
+def parent_chain(path, n):
+    for i in range(n):
+        path = os.path.dirname(path)
+    return path
+sys.path.insert(1, parent_chain(FILEPATH, 2))
+
+# Project level dependencies
+from constants import *
 
 class Decoder():
 
@@ -25,13 +37,13 @@ class Decoder():
         return mac_address, timestamp, sequence_number, payload
 
     @staticmethod
-    def reconstruct_data(requests):
-        mac_address = requests[0][MAC_ADDRESS]
-        timestamp = requests[0][TIMESTAMP]
-        name = requests[0][PAYLOAD]
-        ordered = sorted(
-            requests, key=lambda request: int(request[SEQUENCE_NUMBER]))
-        payload = ''.join([request[PAYLOAD] for request in ordered[1:-1]])
+    def reconstruct_data(payloads):
+        """
+        Given a list of encoded payloads (assumed to be ordered correctly),
+        this function reconstructs the original data by combining and base64
+        decoding the payloads.
+        """
+        combined_payload = ''.join(payloads)
         decoded_payload = base64.b64decode(
             payload.encode('ascii')).decode('utf-8')
-        return mac_address, timestamp, name, decoded_payload
+        return decoded_payload
