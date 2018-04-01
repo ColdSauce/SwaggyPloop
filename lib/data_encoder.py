@@ -27,9 +27,11 @@ class Encoder():
         """
         Validates and returns the DNS request prefix.
         """
-        assert len(mac_address) == MAC_ADDRESS_BYTES
+        assert len(str(mac_address)) <= MAC_ADDRESS_BYTES
         assert len(timestamp) == TIMESTAMP_BYTES
         assert len(str(sequence_number)) <= SEQUENCE_NUMBER_BYTES
+        padded_mac_address = (
+            '{:0' + str(MAC_ADDRESS_BYTES) + 'd}').format(mac_address)
         padded_sequence_number = (
             '{:0' + str(SEQUENCE_NUMBER_BYTES) + 'd}').format(sequence_number)
         return str(mac_address) + str(timestamp) + padded_sequence_number
