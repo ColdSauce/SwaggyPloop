@@ -70,11 +70,11 @@ class Encoder():
         for sequence_number, payload in enumerate(payloads):
             prefix = Encoder.__get_request_prefix__(
                 mac_address, timestamp, sequence_number + 1)
-            request = prefix + payload
+            request = prefix + payload + '.'
             requests.append(request)
         # Add end delimeter
         requests.append(Encoder.__get_request_prefix__(
-            mac_address, timestamp, 0) + 'END')
+            mac_address, timestamp, 0) + 'END.')
         return requests
 
 if __name__ == '__main__':
