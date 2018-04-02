@@ -27,15 +27,32 @@ $(function () {
         });
     }
 
-    function toggleSiblingVisibility() {
-        const sibling = $(this);
-        if (sibling.css('display') === 'none') {
-            sibling.css('display', 'block');
+    var toggledMainState = 0;
+
+    function toggleVisibility(someElement, shouldUseMainState) {
+        if (shouldUseMainState === 1) {
+            if(toggledMainState === 0) {
+                someElement.css('display', 'block');
+                toggledMainState = 1;
+            } else {
+                someElement.css('display', 'none');
+                toggledMainState = 0;
+            }
+            return;
+        }
+        if (someElement.css('display') === 'none') {
+            someElement.css('display', 'block');
         } else {
-            sibling.css('display', 'none');
+            someElement.css('display', 'none');
         }
     }
 
+    function toggleChildrenVisibility() {
+        const children = $(this).children();
+        children.each(function () {
+            toggleVisibility($(this), 1);
+        });
+    }
 
     getInfectedHosts((hosts) => {
         hosts.forEach((host) => {
@@ -43,19 +60,28 @@ $(function () {
                 const hostDiv = $("<div class=\"host_name\"> </div>");
                 const hostLink = $("<a href=\"#\" class=\"host_link\">" + host + "</a>");
                 hostLink.click(function () {
-                    $(this).siblings().each(toggleSiblingVisibility);
+                    $(this).siblings().each(toggleChildrenVisibility);
+                    return false;
                 });
                 hostDiv.append(hostLink);
                 $("#infected_hosts").append(hostDiv);
 
                 payloads.forEach((payload) => {
                     const userPayloadsDiv = $("<div class=\"user_payloads\"></div>");
-                    const userPayloadsLink = $("Name: <a href=\"#\" class=\"payload_name_link\"" + payload['name'] + "</a>");
+                    const userPayloadsLink = $("<div> Name: <a href=\"#\" class=\"payload_name_link\">" + payload['name'] + "</a> </div>");
+                    userPayloadsLink.click(function () {
+                        console.log($(this).closest('.user_payloads').siblings().each(function () {
+                            toggleVisibility($(this));
+                        }));
+                        return false;
+                    });
                     userPayloadsDiv.append(userPayloadsLink);
                     getPayload(host, payload['payload_id'], (data) => {
                         const payloadDataDiv = $("<div class=\"payload\">" + data + "</div>")
-                        hostDiv.append(userPayloadsDiv);
-                        hostDiv.append(payloadDataDiv);
+                        const containerDiv = $("<div></div>")
+                        containerDiv.append(userPayloadsDiv);
+                        containerDiv.append(payloadDataDiv);
+                        hostDiv.append(containerDiv);
                     });
                 });
             });
