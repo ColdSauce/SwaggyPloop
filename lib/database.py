@@ -45,7 +45,20 @@ class Database:
             (mac_address, payload_id, sequence_number, payload))
         self.connection.commit()
 
-    def get(self, mac_address, payload_id):
+    def get_all_mac_addresses(self):
+        self.cursor.execute(
+            '''SELECT DISTINCT mac_address FROM exfiltrated_data''')
+        return [entry for entry in self.cursor]
+
+    def get_all_payload_names(self, mac_address):
+        self.cursor.execute(
+            '''SELECT payload_id,payload FROM exfiltrated_data
+            WHERE mac_address=? AND sequence_number=1
+            ORDER BY payload_id ASC''',
+            (mac_address,))
+        return [entry for entry in self.cursor]
+
+    def get_payload(self, mac_address, payload_id):
         self.cursor.execute(
             '''SELECT * FROM exfiltrated_data
             WHERE mac_address=? AND payload_id=?

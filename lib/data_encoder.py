@@ -76,6 +76,3 @@ class Encoder():
         requests.append(Encoder.__get_request_prefix__(
             mac_address, timestamp, 0) + 'END.')
         return requests
-
-if __name__ == '__main__':
-    print(Encoder.encode_payload('ABCDEF', '1111100000', 'bobthe', 'dasdf'))
