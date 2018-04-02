@@ -1,12 +1,17 @@
 <html>
     <head>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script src="{{url_for('static', filename='index.js')}}"></script>
     </head>
 
     <body>
-        <form>
+        <form id="search_form">
             <input type="text"></input>
-            <input type="button" value="Search"></input>
+            <input type="submit" value="Search"></input>
         </form>
+
+        <ul id="infected_hosts">
+
+        </ul>
     </body>
 </html>
