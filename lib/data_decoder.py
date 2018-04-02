@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # This module will be used to handle the decoding of encoded requests sent
-# through DNS. This decoder will only split the requests into its appropriate
-# segments and will not handle payload reconstruction.
+# through DNS.
 
 import base64
 import os
@@ -22,7 +21,7 @@ def parent_chain(path, n):
 sys.path.insert(1, parent_chain(FILEPATH, 2))
 
 # Project level dependencies
-from constants import *
+from lib.constants import *
 
 class Decoder():
 
@@ -44,6 +43,7 @@ class Decoder():
         decoding the payloads.
         """
         combined_payload = ''.join(payloads)
+        print(combined_payload)
         decoded_payload = base64.b64decode(
-            payload.encode('ascii')).decode('utf-8')
+            combined_payload.encode('ascii')).decode('utf-8')
         return decoded_payload

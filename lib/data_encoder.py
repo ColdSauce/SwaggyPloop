@@ -27,16 +27,14 @@ class Encoder():
         """
         Validates and returns the DNS request prefix.
         """
-        assert len(str(mac_address)) <= MAC_ADDRESS_BYTES
+        assert len(str(mac_address)) == MAC_ADDRESS_BYTES
         assert len(str(timestamp)) <= TIMESTAMP_BYTES
         assert len(str(sequence_number)) <= SEQUENCE_NUMBER_BYTES
-        padded_mac_address = (
-            '{:0' + str(MAC_ADDRESS_BYTES) + 'd}').format(mac_address)
         padded_timestamp = (
             '{:0' + str(TIMESTAMP_BYTES) + 'd}').format(timestamp)
         padded_sequence_number = (
             '{:0' + str(SEQUENCE_NUMBER_BYTES) + 'd}').format(sequence_number)
-        return padded_mac_address + padded_timestamp + padded_sequence_number
+        return mac_address + padded_timestamp + padded_sequence_number
 
     @staticmethod
     def __split_payload__(payload):

