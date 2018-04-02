@@ -5,7 +5,7 @@ This project contains the infrastructure for a piece of malware that exfiltrates
 * The `dns` folder contains our own custom fork of the `dnspython` library, which we use to form the DNS requests on the client side.
 * The `dns_server` folder contains our custom DNS server that listens for incoming requests structured according to our custom request format and logs them in a database for later reconstruction.
 * The `lib` folder contains the code that handles the encoding and packet structuring to break apart the files for transit as well as the code for reconstructing them on the server side. This folder also contains utility code for logging and querying into the database.
-* The `web_interface` folder contains a web interface for viewing the data chunks logged in the database and allows for the reconstructed data to visualized.
+* The `web_interface` folder contains a web interface for viewing the data chunks logged in the database and allows for the reconstructed data to be visualized.
 
 The accompanying antivirus can be found [here](https://github.com/CrMallard/Antibody)
 
