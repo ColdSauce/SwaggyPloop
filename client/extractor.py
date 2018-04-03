@@ -23,7 +23,7 @@ class Extractor():
         self.magi = magic.Magic(mime=True)
 
     def _is_in_blacklist(self, file_name):
-        blacklist = ['node_modules', 'test', 'site-packages', '/usr/share']
+        blacklist = ['node_modules', 'test', 'site-packages', '/usr/share', '/usr/lib', '/usr/source/', 'malware_client']
         for black in blacklist:
             if black in file_name:
                 return True
