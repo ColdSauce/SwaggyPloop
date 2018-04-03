@@ -45,6 +45,8 @@ class Extractor():
                             result = re.findall(r[1], file_contents)
                             if len(result) != 0:
                                 all_files_found.append(file_name)
-                except IOError:
+                except KeyboardInterrupt:
+                    raise SystemExit
+                except:
                     continue
         return all_files_found
