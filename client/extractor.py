@@ -30,7 +30,7 @@ class Extractor():
 
     def get_sensitive_files(self, directory):
         all_files_found = []
-        for root, directories, files in os.walk(directory):
+        for root, _, files in os.walk(directory):
             for file in files:
                 file_name = os.path.join(root, file)
                 if self._is_in_blacklist(file_name):

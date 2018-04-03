@@ -116,8 +116,10 @@ $(function () {
                 userPayloadsDiv.append(userPayloadsLink);
 
                 const payload = await getPayload(host, payloadObject['payload_id']);
-                const payloadDataDiv = $("<div class=\"payload\">" + payload + "</div>")
-                const containerDiv = $("<div class=\"container\"></div>")
+                
+                const payloadDataDiv = $("<pre class=\"payload\"></pre>");
+                payloadDataDiv.append(payload);
+                const containerDiv = $("<div class=\"container\"></div>");
                 containerDiv.css("display", "none");
                 containerDiv.append(userPayloadsDiv);
                 containerDiv.append(payloadDataDiv);
@@ -130,7 +132,6 @@ $(function () {
 
     $("#search_text").on("input", function(e) {
         searchText = $(this).val();
-        console.log(searchText);
     });
 
     (async function() {

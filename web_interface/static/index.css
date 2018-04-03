@@ -9,6 +9,20 @@ body {
     color: #fff;
     font-family: 'VT323', monospace;
 }
+pre {
+    font-family: 'VT323', monospace;
+    background-color: #111111;
+    padding: 10px 10px 10px 10px;
+    /*
+        The following wrapping code was taken from the answer on "How to wrap pre tags."
+        https://stackoverflow.com/questions/248011/how-do-i-wrap-text-in-a-pre-tag
+    */
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
 
 img {
     height: 100px;
