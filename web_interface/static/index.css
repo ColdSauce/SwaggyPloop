@@ -9,6 +9,7 @@ body {
     color: #fff;
     font-family: 'VT323', monospace;
 }
+
 pre {
     font-family: 'VT323', monospace;
     background-color: #111111;
@@ -22,6 +23,16 @@ pre {
     white-space: -pre-wrap;      /* Opera 4-6 */
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.container {
+    margin-left: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.host_name {
+    margin-bottom: 5px;
 }
 
 img {
