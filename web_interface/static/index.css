@@ -1,3 +1,27 @@
 .user_payloads, .payload {
     display: none;
 }
+
+body {
+    padding-left: 10px;
+    background-color: #000;
+    color: #fff;
+    font-family: 'VT323', monospace;
+}
+
+img {
+    height: 100px;
+    width: 100px;
+}
+
+a {
+    color: white;
+}
+
+a:hover {
+    color: #eaeaea;
+}
+
+.host_name * {
+    margin-bottom: 10px;
+}
