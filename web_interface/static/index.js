@@ -1,37 +1,33 @@
-console.log("hello world");
-
 $(function () {
-
-
-    const getInfectedHosts = (cb) => {
-        return $.ajax({
+    async function getInfectedHosts() {
+        const ajaxCall = await $.ajax({
             url: "/get_infected_hosts",
-            cache: false,
-            success: (j) => cb(JSON.parse(j))
+            cache: false
         });
+        return JSON.parse(ajaxCall);
     }
 
-    const getPayloads = (macAddress, cb) => {
-        return $.ajax({
+    async function getPayloads(macAddress) {
+        const ajaxCall = await $.ajax({
             url: "/get_payloads?mac_address=" + macAddress,
-            cache: false,
-            success: (j) => cb(JSON.parse(j))
-        });
+            cache: false
+        })
+        return JSON.parse(ajaxCall);
     }
 
-    const getPayload = (macAddress, payloadId, cb) => {
-        return $.ajax({
+    async function getPayload(macAddress, payloadId) {
+        const ajaxCall = await $.ajax({
             url: "/get_payload?mac_address=" + macAddress + "&payload_id=" + payloadId,
-            cache: false,
-            success: cb
+            cache: false
         });
+        return ajaxCall;
     }
 
     var toggledMainState = 0;
 
     function toggleVisibility(someElement, shouldUseMainState) {
         if (shouldUseMainState === 1) {
-            if(toggledMainState === 0) {
+            if (toggledMainState === 0) {
                 someElement.css('display', 'block');
                 toggledMainState = 1;
             } else {
@@ -42,52 +38,104 @@ $(function () {
         }
         if (someElement.css('display') === 'none') {
             someElement.css('display', 'block');
-        } else {
+        } else if (someElement.css('display') === 'block') {
+            console.log("thinks it is display block")
             someElement.css('display', 'none');
         }
     }
 
     function toggleChildrenVisibility() {
+        toggleVisibility($(this));
         const children = $(this).children();
         children.each(function () {
             toggleVisibility($(this), 1);
         });
     }
 
-    getInfectedHosts((hosts) => {
-        hosts.forEach((host) => {
-            getPayloads(host, (payloads) => {
-                const hostDiv = $("<div class=\"host_name\"> </div>");
-                const hostLink = $("<a href=\"#\" class=\"host_link\">" + host + "</a>");
-                hostLink.click(function () {
-                    $(this).siblings().each(toggleChildrenVisibility);
-                    return false;
-                });
-                hostDiv.append(hostLink);
-                $("#infected_hosts").append(hostDiv);
+    function createHostLink(host) {
+        const hostLink = $("<a>");
 
-                payloads.forEach((payload) => {
-                    const userPayloadsDiv = $("<div class=\"user_payloads\"></div>");
-                    const userPayloadsLink = $("<div> Name: <a href=\"#\" class=\"payload_name_link\">" + payload['name'] + "</a> </div>");
-                    userPayloadsLink.click(function () {
-                        console.log($(this).closest('.user_payloads').siblings().each(function () {
-                            toggleVisibility($(this));
-                        }));
-                        return false;
-                    });
-                    userPayloadsDiv.append(userPayloadsLink);
-                    getPayload(host, payload['payload_id'], (data) => {
-                        const payloadDataDiv = $("<div class=\"payload\">" + data + "</div>")
-                        const containerDiv = $("<div></div>")
-                        containerDiv.append(userPayloadsDiv);
-                        containerDiv.append(payloadDataDiv);
-                        hostDiv.append(containerDiv);
-                    });
-                });
-            });
+        hostLink.append(host)
+        hostLink.attr("href", "#");
+        hostLink.addClass("host_link");
+
+        hostLink.click(function () {
+            $(this).siblings().each(toggleChildrenVisibility);
+            return false;
         });
 
+        return hostLink;
+    }
+
+    function createHostDiv() {
+        const hostDiv = $("<div>");
+        hostDiv.addClass("host_name");
+        return hostDiv;
+    }
+
+    function createUserPayloadsDiv() {
+        const userPayloadsDiv = $("<div>");
+        userPayloadsDiv.addClass("user_payloads");
+        return userPayloadsDiv;
+    }
+
+    function createUserPayloadsLink(payload) {
+        const userPayloadsLink = $("<div>");
+        userPayloadsLink.append("Name: ");
+
+        const userPayloadsLinkAnchor  = $("<a>");
+        userPayloadsLinkAnchor.attr("href", "#");
+        userPayloadsLinkAnchor.addClass("payload_name_link");
+        userPayloadsLinkAnchor.append(payload['name']);
+
+        userPayloadsLink.append(userPayloadsLinkAnchor);
+        userPayloadsLink.click(function () {
+            console.log($(this).closest('.user_payloads').siblings().each(function () {
+                toggleVisibility($(this));
+            }));
+            return false;
+        });
+        return userPayloadsLink;
+    }
+
+    async function createUI() {
+        const infectedHosts = await getInfectedHosts();
+        infectedHosts.forEach(async (host) => {
+            const payloads = await getPayloads(host);
+
+            const hostDiv = createHostDiv();
+            const hostLink = createHostLink(host);
+
+            hostDiv.append(hostLink);
+            $("#infected_hosts").append(hostDiv);
+
+            payloads.forEach(async (payloadObject) => {
+                const userPayloadsDiv = createUserPayloadsDiv();
+                const userPayloadsLink = createUserPayloadsLink(payloadObject);
+                
+                userPayloadsDiv.append(userPayloadsLink);
+
+                const payload = await getPayload(host, payloadObject['payload_id']);
+                const payloadDataDiv = $("<div class=\"payload\">" + payload + "</div>")
+                const containerDiv = $("<div class=\"container\"></div>")
+                containerDiv.css("display", "none");
+                containerDiv.append(userPayloadsDiv);
+                containerDiv.append(payloadDataDiv);
+                hostDiv.append(containerDiv);
+            });
+        });
+    };
+    
+    var searchText = "";
+
+    $("#search_text").on("input", function(e) {
+        searchText = $(this).val();
+        console.log(searchText);
     });
+
+    (async function() {
+        await createUI();
+    })();
 
     $("#search_form").submit(function (e) {
         return false;
