@@ -23,13 +23,16 @@ from lib.constants import *
 class Encoder():
 
     @staticmethod
+    def __pad_mac_address(mac_address):
+        chars_to_pad = MAC_ADDRESS_BYTES - len(mac_address)
+        return mac_address.zfill(chars_to_pad)
+
+    @staticmethod
     def __get_request_prefix__(mac_address, timestamp, sequence_number):
         """
         Validates and returns the DNS request prefix.
         """
-        print("mac address: ");
-        print(str(mac_address));
-        print(len(str(mac_address)));
+        mac_address = Encoder.__pad_mac_address(mac_address)
         assert len(str(mac_address)) == MAC_ADDRESS_BYTES
         assert len(str(timestamp)) <= TIMESTAMP_BYTES
         assert len(str(sequence_number)) <= SEQUENCE_NUMBER_BYTES
