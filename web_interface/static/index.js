@@ -1,10 +1,30 @@
 $(function () {
+
+    const entityMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+        '/': '&#x2F;',
+        '`': '&#x60;',
+        '=': '&#x3D;'
+      };
+
+    // The following code was borrowed from a Stackoverflow answer on escaping HTML to mitigate XSS
+    // https://stackoverflow.com/questions/24816/escaping-html-strings-with-jquery
+    function escapeHtml (string) {
+        return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+            return entityMap[s];
+        });
+    }
+
     async function getInfectedHosts() {
         const ajaxCall = await $.ajax({
             url: "/get_infected_hosts",
             cache: false
         });
-        return JSON.parse(ajaxCall);
+        return JSON.parse(ajaxCall).map(escapeHtml);
     }
 
     async function getPayloads(macAddress) {
@@ -12,7 +32,12 @@ $(function () {
             url: "/get_payloads?mac_address=" + macAddress,
             cache: false
         })
-        return JSON.parse(ajaxCall);
+        return JSON.parse(ajaxCall).map((payload) => {
+            return {
+                name: escapeHtml(payload.name),
+                payload_id: escapeHtml(payload.payload_id)
+            };
+        });
     }
 
     async function getPayload(macAddress, payloadId) {
@@ -20,7 +45,7 @@ $(function () {
             url: "/get_payload?mac_address=" + macAddress + "&payload_id=" + payloadId,
             cache: false
         });
-        return ajaxCall;
+        return escapeHtml(ajaxCall);
     }
 
     var toggledMainState = 0;
@@ -39,7 +64,6 @@ $(function () {
         if (someElement.css('display') === 'none') {
             someElement.css('display', 'block');
         } else if (someElement.css('display') === 'block') {
-            console.log("thinks it is display block")
             someElement.css('display', 'none');
         }
     }
@@ -90,9 +114,9 @@ $(function () {
 
         userPayloadsLink.append(userPayloadsLinkAnchor);
         userPayloadsLink.click(function () {
-            console.log($(this).closest('.user_payloads').siblings().each(function () {
+            $(this).closest('.user_payloads').siblings().each(function () {
                 toggleVisibility($(this));
-            }));
+            });
             return false;
         });
         return userPayloadsLink;
@@ -127,18 +151,8 @@ $(function () {
             });
         });
     };
-    
-    var searchText = "";
-
-    $("#search_text").on("input", function(e) {
-        searchText = $(this).val();
-    });
 
     (async function() {
         await createUI();
     })();
-
-    $("#search_form").submit(function (e) {
-        return false;
-    });
 });
