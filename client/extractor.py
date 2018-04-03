@@ -23,7 +23,7 @@ class Extractor():
         self.magi = magic.Magic(mime=True)
 
     def _is_in_blacklist(self, file_name):
-        blacklist = ['node_modules', 'test', 'site-packages', '/usr/share', '/usr/lib', '/usr/source/', 'malware_client']
+        blacklist = ['node_modules', 'test', 'site-packages', '/usr/share', '/usr/lib', '/usr/source']
         for black in blacklist:
             if black in file_name:
                 return True
@@ -31,13 +31,11 @@ class Extractor():
 
     def get_sensitive_files(self, directory):
         all_files_found = []
-        old_root = ''
         for root, _, files in os.walk(directory):
             if self._is_in_blacklist(root):
                 continue
             for file in files:
                 file_name = os.path.join(root, file)
-                print(file_name)
                 try:
                     if self.magi.from_file(file_name) != 'text/plain':
                         continue
