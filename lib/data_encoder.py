@@ -24,8 +24,7 @@ class Encoder():
 
     @staticmethod
     def __pad_mac_address(mac_address):
-        chars_to_pad = MAC_ADDRESS_BYTES - len(mac_address)
-        return mac_address.zfill(chars_to_pad)
+        return mac_address.zfill(MAC_ADDRESS_BYTES)
 
     @staticmethod
     def __get_request_prefix__(mac_address, timestamp, sequence_number):
