@@ -36,6 +36,7 @@ class Extractor():
                 continue
             for file in files:
                 file_name = os.path.join(root, file)
+                print(file_name)
                 try:
                     if self.magi.from_file(file_name) != 'text/plain':
                         continue
